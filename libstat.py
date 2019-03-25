@@ -1,5 +1,7 @@
 #!/usr/bin/python3
 
+# libstat.py
+
 import os
 import subprocess
 
@@ -37,6 +39,9 @@ class Battery:
     def battery_time():
         return int(Battery.get("power_now"))
 
+    def is_charging():
+        return Battery.get("status") == "Charging"
+
 # Memory
 class Memory:
     def percent():
@@ -67,3 +72,40 @@ class Disk:
     def total(path):
         return psutil.disk_usage(path).total
 
+## Common Functions
+def interpret_time(text):
+    # Interpret the text from left to right and add on to the total.
+    # Time Texts are written as:
+    # Xd Xh Xm Xs
+    # With spaces in between.
+    # The value returned is in seconds.
+    total = 0
+
+    cap = ""
+
+    for i in text:
+        if i in "0123456789":
+            cap += i
+        elif i == "d":
+            total += int(cap) * 24 * 60 * 60
+        elif i == "h":
+            total += int(cap) * 60 * 60
+        elif i == "m":
+            total += int(cap) * 60
+        else:
+            total += int(cap)
+
+    total += int(cap)
+
+    return total
+
+def getch():
+    import sys, tty, termios
+    fd = sys.stdin.fileno()
+    old_settings = termios.tcgetattr(fd)
+    try:
+        tty.setraw(sys.stdin.fileno())
+        ch = sys.stdin.read(1)
+    finally:
+            termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+    return ch
