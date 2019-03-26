@@ -8,6 +8,7 @@ import datetime
 import time
 import requests
 import socket
+import os
 
 # STAT is a program for doing hard things the easy way.
 # Certain parts of STAT may be written in much more complicated languages.
@@ -20,6 +21,8 @@ print(" --- STAT ---")
 
 ## BATTERY
 def print_battery_usage():
+    if not os.path.isdir("/sys/class/power_supply/BAT0"):
+        return
     percent = stat.Battery.battery_percent()
     time = stat.Battery.battery_time() / 60000
 
@@ -163,7 +166,7 @@ while True:
 
         ## Get their Private IP
         prvip = socket.gethostbyname(socket.gethostname())
-        print(stat.Colors.warning + "  Private: " + prvip)
+        print(stat.Colors.warning + "  Private: " + prvip + stat.Colors.end)
     else:
         if prog != "":
             print(" " + prog + ": not a known command.")
